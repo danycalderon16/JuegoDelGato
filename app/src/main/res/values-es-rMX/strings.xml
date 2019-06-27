@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Juego del Gato</string>
+    <string name="action_settings">Configuraciones</string>
     <string name="start">Empezar</string>
     <string name="start_again">Volver a Jugar</string>
     <string name="p_one_won">Jugador 1 Ganó</string>
@@ -9,4 +10,10 @@
     <string name="turn1">Turno jugador 1</string>
     <string name="turn2">Turno jugador 2</string>
     <string name="finish">Finalizado</string>
+    <string name="title_activity_statistics">Estadisticas</string>
+    <string name="p_one">Jugador 1 </string>
+    <string name="p_two">Jugador 2 </string>
+    <string name="one_vs_two">Jugador 1 vs Jugador 2</string>
+    <string name="one_vs_comp">Jugador 1 vs Computadora</string>
+    <string name="select_players">Seleccione jugadores</string>
 </resources>

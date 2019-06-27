@@ -1,5 +1,8 @@
 package com.app.calderon.juegogato;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,10 +16,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
+
+import static com.app.calderon.juegogato.Util.PLAYER_ONE_VS_COMPUTER;
+import static com.app.calderon.juegogato.Util.PLAYER_ONE_VS_PLAYER_TWO;
+import static com.app.calderon.juegogato.Util.getSettingsPlayer;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -32,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private FloatingActionButton fabStart;
 
-    private TextView txtTrun;
+    private TextView txtTurn;
 
     private boolean box1Player1;
     private boolean box2Player1;
@@ -60,6 +68,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private int counter = 0;
 
+    private SharedPreferences pref;
+    private SharedPreferences prefs;
+    private int winPlayer1 = 0;
+    private int winPlayer2 = 0;
+    private int tiedGames  = 0;
+
     private CoordinatorLayout clayout;
 
     private AdView mAdView;
@@ -71,15 +85,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         MobileAds.initialize(this, "ca-app-pub-2807565067627797~1779610712");
 
+        pref = getSharedPreferences("counters", Context.MODE_PRIVATE);
+        prefs = getSharedPreferences("settings",Context.MODE_PRIVATE);
+
+
         mAdView = findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
+
+        try{
+            winPlayer1 =  getCounterP1Saved();
+            winPlayer2 =  getCounterP2Saved();
+            tiedGames = getCounterTiedSaved();            
+        }catch (NullPointerException e){
+            winPlayer1 =  0;
+            winPlayer2 =  0;
+            tiedGames = 0;
+        }
+
+        putPlayerSettings();
 
         sendToolbar();
         sendBind();
         sendOnClick();
         disabledButtons();
         cleanButtons();
+    }
+
+    private void putPlayerSettings() {
+        int i = getSettingsPlayer(prefs);
+        if(i==PLAYER_ONE_VS_PLAYER_TWO)
+            Toast.makeText(this, "1 vs 2", Toast.LENGTH_SHORT).show();
+        if(i==PLAYER_ONE_VS_COMPUTER)
+            Toast.makeText(this, "1 vs Computer", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -91,13 +129,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
+        if (id == R.id.action_statistics) {
+            Intent intent = new Intent(MainActivity.this,StatisticsActivity.class);
+            startActivity(intent);
+            return true;
+        }
+
+
         if (id == R.id.action_settings) {
+            startActivity(new Intent(this,SettingsActivity.class));
             return true;
         }
 
@@ -233,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         button9 = (Button) findViewById(R.id.btn9);
         fabStart = (FloatingActionButton) findViewById(R.id.startAgain);
         clayout = (CoordinatorLayout) findViewById(R.id.clayout);
-        txtTrun = findViewById(R.id.txtTurn);
+        txtTurn = findViewById(R.id.txtTurn);
     }
 
     private void sendOnClick() {
@@ -269,8 +312,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 setSnackBbr(getString(R.string.tied_game), getColor(R.color.colorAccent));
             }
             disabledButtons();
+            tiedGames++;
+            saveCounterTied();
+            Toast.makeText(this, "e++", Toast.LENGTH_SHORT).show();
         }
-
     }
 
     private void writeCircle(Button button) {
@@ -284,31 +329,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void changeTurn() {
         if (TURN == PLAYER_ONE){
             TURN = PLAYER_TWO;
-            txtTrun.setText(getString(R.string.turn2));}
+            txtTurn.setText(getString(R.string.turn2));}
         else if (TURN == PLAYER_TWO){
             TURN = PLAYER_ONE;
-            txtTrun.setText(getString(R.string.turn1));}
+            txtTurn.setText(getString(R.string.turn1));}
     }
 
     private void checkGame() {
 
-        genericCheckGame(box1Player1, box2Player1, box3Player1, button1, button2, button3, PLAYER_ONE);
-        genericCheckGame(box4Player1, box5Player1, box6Player1, button4, button5, button6, PLAYER_ONE);
-        genericCheckGame(box7Player1, box8Player1, box9Player1, button7, button8, button9, PLAYER_ONE);
-        genericCheckGame(box1Player1, box4Player1, box7Player1, button1, button4, button7, PLAYER_ONE);
-        genericCheckGame(box2Player1, box5Player1, box8Player1, button2, button5, button8, PLAYER_ONE);
-        genericCheckGame(box3Player1, box6Player1, box9Player1, button3, button6, button9, PLAYER_ONE);
-        genericCheckGame(box1Player1, box5Player1, box9Player1, button1, button5, button9, PLAYER_ONE);
-        genericCheckGame(box3Player1, box5Player1, box7Player1, button3, button5, button7, PLAYER_ONE);
+        if(genericCheckGame(box1Player1, box2Player1, box3Player1, button1, button2, button3, PLAYER_ONE))return;
+        if(genericCheckGame(box4Player1, box5Player1, box6Player1, button4, button5, button6, PLAYER_ONE))return;
+        if(genericCheckGame(box7Player1, box8Player1, box9Player1, button7, button8, button9, PLAYER_ONE))return;
+        if(genericCheckGame(box1Player1, box4Player1, box7Player1, button1, button4, button7, PLAYER_ONE))return;
+        if(genericCheckGame(box2Player1, box5Player1, box8Player1, button2, button5, button8, PLAYER_ONE))return;
+        if(genericCheckGame(box3Player1, box6Player1, box9Player1, button3, button6, button9, PLAYER_ONE))return;
+        if(genericCheckGame(box1Player1, box5Player1, box9Player1, button1, button5, button9, PLAYER_ONE))return;
+        if(genericCheckGame(box3Player1, box5Player1, box7Player1, button3, button5, button7, PLAYER_ONE))return;
 
-        genericCheckGame(box1Player2, box2Player2, box3Player2, button1, button2, button3, PLAYER_TWO);
-        genericCheckGame(box4Player2, box5Player2, box6Player2, button4, button5, button6, PLAYER_TWO);
-        genericCheckGame(box7Player2, box8Player2, box9Player2, button7, button8, button9, PLAYER_TWO);
-        genericCheckGame(box1Player2, box4Player2, box7Player2, button1, button4, button7, PLAYER_TWO);
-        genericCheckGame(box2Player2, box5Player2, box8Player2, button2, button5, button8, PLAYER_TWO);
-        genericCheckGame(box3Player2, box6Player2, box9Player2, button3, button6, button9, PLAYER_TWO);
-        genericCheckGame(box1Player2, box5Player2, box9Player2, button1, button5, button9, PLAYER_TWO);
-        genericCheckGame(box3Player2, box5Player2, box7Player2, button3, button5, button7, PLAYER_TWO);
+        if(genericCheckGame(box1Player2, box2Player2, box3Player2, button1, button2, button3, PLAYER_TWO))return;
+        if(genericCheckGame(box4Player2, box5Player2, box6Player2, button4, button5, button6, PLAYER_TWO))return;
+        if(genericCheckGame(box7Player2, box8Player2, box9Player2, button7, button8, button9, PLAYER_TWO))return;
+        if(genericCheckGame(box1Player2, box4Player2, box7Player2, button1, button4, button7, PLAYER_TWO))return;
+        if(genericCheckGame(box2Player2, box5Player2, box8Player2, button2, button5, button8, PLAYER_TWO))return;
+        if(genericCheckGame(box3Player2, box6Player2, box9Player2, button3, button6, button9, PLAYER_TWO))return;
+        if(genericCheckGame(box1Player2, box5Player2, box9Player2, button1, button5, button9, PLAYER_TWO))return;
+        if(genericCheckGame(box3Player2, box5Player2, box7Player2, button3, button5, button7, PLAYER_TWO))return;
 
     }
 
@@ -319,7 +364,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         TURN = PLAYER_ONE;
         counter = 0;
         fabStart.setImageResource(R.drawable.refresh);
-        txtTrun.setText(getString(R.string.turn1));
+        txtTurn.setText(getString(R.string.turn1));
 
     }
 
@@ -380,7 +425,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         button9.setEnabled(false);
     }
 
-    private void genericCheckGame(boolean boolean1, boolean boolean2, boolean boolean3,
+    private boolean genericCheckGame(boolean boolean1, boolean boolean2, boolean boolean3,
                                   Button btn1, Button btn2, Button btn3,
                                   int player) {
         if (boolean1 && boolean2 && boolean3) {
@@ -388,15 +433,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (player == PLAYER_ONE) {
                     setSnackBbr(getString(R.string.p_one_won), getColor(R.color.circleWon));
                     drawLinesO(btn1, btn2, btn3);
+                    winPlayer1++;
+                    saveCounterP1();
+                    Toast.makeText(this, "1++", Toast.LENGTH_SHORT).show();
                 }
                 if (player == PLAYER_TWO) {
                     setSnackBbr(getString(R.string.p_two_won), getColor(R.color.exWon));
                     drawLinesX(btn1, btn2, btn3);
+                    winPlayer2++;
+                    saveCounterP2();
+                    Toast.makeText(this, "2++", Toast.LENGTH_SHORT).show();
                 }
             }
             counter = 0;
             disabledButtons();
-            txtTrun.setText(getString(R.string.finish));
+            txtTurn.setText(getString(R.string.finish));
+            return true;
+        }else {
+            return false;
         }
     }
 
@@ -422,4 +476,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         snack.show();
     }
+
+    private void saveCounterP1() {
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putInt("countP1", winPlayer1);
+        editor.apply();
+    }
+
+    private void saveCounterP2() {
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putInt("countP2", winPlayer2);
+        editor.apply();
+    }
+
+    private void saveCounterTied() {
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putInt("tied", tiedGames);
+        editor.apply();
+    }
+
+    private int getCounterP1Saved() {
+        return pref.getInt("countP1", winPlayer1);
+    }
+
+    private int getCounterP2Saved() {
+        return pref.getInt("countP2", winPlayer2);
+    }
+
+    private int getCounterTiedSaved() {
+        return pref.getInt("tied", tiedGames);
+    }
+
 }

@@ -21,9 +21,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-2807565067627797~1779610712"/>
+            android:value="ca-app-pub-2807565067627797~1779610712" />
+
+        <activity
+            android:name=".StatisticsActivity"
+            android:label="@string/title_activity_statistics"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".SettingsActivity"></activity>
     </application>
 
 </manifest>
