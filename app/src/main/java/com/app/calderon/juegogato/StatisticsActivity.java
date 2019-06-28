@@ -4,7 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -68,6 +70,19 @@ public class StatisticsActivity extends AppCompatActivity implements View.OnClic
         txtP2 = findViewById(R.id.txtP2);
         tied = findViewById(R.id.txtTied);
         fab.setOnClickListener(this);
+
+        txtP1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Snackbar.make(fab,"Este es un ejemplo",Snackbar.LENGTH_SHORT).show();
+                    }
+                },3000);
+            }
+        });
     }
 
     @Override

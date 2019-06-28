@@ -48,6 +48,7 @@ public class SettingsActivity extends AppCompatActivity implements RadioGroup.On
         first = findViewById(R.id.first);
         second = findViewById(R.id.second);
         familyRadio.setOnCheckedChangeListener(this);
+
     }
 
     private void setToolbar() {
