@@ -16,6 +16,13 @@ import android.widget.Toast;
 
 import java.util.Locale;
 
+import static com.app.calderon.juegogato.Util.getCounterP1Saved;
+import static com.app.calderon.juegogato.Util.getCounterP2Saved;
+import static com.app.calderon.juegogato.Util.getCounterTiedSaved;
+import static com.app.calderon.juegogato.Util.saveCounterP1;
+import static com.app.calderon.juegogato.Util.saveCounterP2;
+import static com.app.calderon.juegogato.Util.saveCounterTied;
+
 
 public class StatisticsActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -42,9 +49,9 @@ public class StatisticsActivity extends AppCompatActivity implements View.OnClic
         sendBind();
         setToolbar();
         try{
-            winPlayer1 =  getCounterP1Saved();
-            winPlayer2 =  getCounterP2Saved();
-            tiedGames = getCounterTiedSaved();
+            winPlayer1 =  getCounterP1Saved(pref,winPlayer1);
+            winPlayer2 =  getCounterP2Saved(pref,winPlayer2);
+            tiedGames  =  getCounterTiedSaved(pref,tiedGames);
         }catch(NullPointerException e){
             winPlayer1 =  0;
             winPlayer2 =  0;
@@ -103,35 +110,6 @@ public class StatisticsActivity extends AppCompatActivity implements View.OnClic
         tied.setText(String.format(Locale.getDefault(), "%d", tiedGames));
     }
 
-    private void saveCounterP1() {
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putInt("countP1", winPlayer1);
-        editor.apply();
-    }
-
-    private void saveCounterP2() {
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putInt("countP2", winPlayer2);
-        editor.apply();
-    }
-
-    private void saveCounterTied() {
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putInt("tied", tiedGames);
-        editor.apply();
-    }
-
-    private int getCounterP1Saved() {
-        return pref.getInt("countP1", winPlayer1);
-    }
-
-    private int getCounterP2Saved() {
-        return pref.getInt("countP2", winPlayer2);
-    }
-
-    private int getCounterTiedSaved() {
-        return pref.getInt("tied", tiedGames);
-    }
 
     @Override
     public void onClick(View v) {
@@ -146,9 +124,9 @@ public class StatisticsActivity extends AppCompatActivity implements View.OnClic
         winPlayer1 = 0;
         winPlayer2 = 0;
         tiedGames  = 0;
-        saveCounterP1();
-        saveCounterP2();
-        saveCounterTied();
+        saveCounterP1(pref,winPlayer1);
+        saveCounterP2(pref,winPlayer2);
+        saveCounterTied(pref,tiedGames);
         sendTxt();
     }
 }

@@ -24,7 +24,7 @@ public class SettingsActivity extends AppCompatActivity implements RadioGroup.On
 
     private SharedPreferences pref;
 
-    String s = Build.DEVICE;
+    String s = Build.MODEL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -24,11 +24,16 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 import static com.app.calderon.juegogato.Util.PLAYER_ONE_VS_COMPUTER;
 import static com.app.calderon.juegogato.Util.PLAYER_ONE_VS_PLAYER_TWO;
+import static com.app.calderon.juegogato.Util.getCounterP1Saved;
+import static com.app.calderon.juegogato.Util.getCounterP2Saved;
+import static com.app.calderon.juegogato.Util.getCounterTiedSaved;
 import static com.app.calderon.juegogato.Util.getSettingsPlayer;
+import static com.app.calderon.juegogato.Util.saveCounterP1;
+import static com.app.calderon.juegogato.Util.saveCounterP2;
+import static com.app.calderon.juegogato.Util.saveCounterTied;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -74,13 +79,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private final int COMPUTER = 3;
     private int TURN = PLAYER_ONE;
 
-    String s = Build.DEVICE;
+    String s = Build.MODEL;
 
 
     private int counter = 0;
 
-    private SharedPreferences pref;
-    private SharedPreferences prefs;
+    private SharedPreferences prefCounters;
+    private SharedPreferences prefsSettings;
     private int winPlayer1 = 0;
     private int winPlayer2 = 0;
     private int tiedGames = 0;
@@ -104,8 +109,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
 
-        if (getSettingsPlayer(prefs) == PLAYER_ONE_VS_COMPUTER) {
+        if (getSettingsPlayer(prefsSettings) == PLAYER_ONE_VS_COMPUTER) {
             computerPlays = true;
+            TURN = PLAYER_ONE;
         }
 
         getCounters();
@@ -120,15 +126,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void getPreferences() {
-        pref = getSharedPreferences("counters", Context.MODE_PRIVATE);
-        prefs = getSharedPreferences("settings", Context.MODE_PRIVATE);
+        prefCounters = getSharedPreferences("counters", Context.MODE_PRIVATE);
+        prefsSettings = getSharedPreferences("settings", Context.MODE_PRIVATE);
     }
 
     private void getCounters() {
         try {
-            winPlayer1 = getCounterP1Saved();
-            winPlayer2 = getCounterP2Saved();
-            tiedGames = getCounterTiedSaved();
+            winPlayer1 = getCounterP1Saved(prefCounters, winPlayer1);
+            winPlayer2 = getCounterP2Saved(prefCounters, winPlayer2);
+            tiedGames = getCounterTiedSaved(prefCounters, tiedGames);
         } catch (NullPointerException e) {
             winPlayer1 = 0;
             winPlayer2 = 0;
@@ -137,11 +143,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void putPlayerSettings() {
-        int i = getSettingsPlayer(prefs);
+        int i = getSettingsPlayer(prefsSettings);
         if (i == PLAYER_ONE_VS_PLAYER_TWO)
             Toast.makeText(this, "1 vs 2", Toast.LENGTH_SHORT).show();
         if (i == PLAYER_ONE_VS_COMPUTER)
-            Toast.makeText(this, "1 vs "+s, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "1 vs " + s, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -171,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return super.onOptionsItemSelected(item);
     }
 
-    private boolean availeble(int j) {
+    private boolean available(int j) {
         boolean flag = true;
         for (int i = 0; i < numbers.size(); i++) {
             if (j == numbers.get(i)) {
@@ -183,24 +189,102 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void turnOfComputer() {
         final int i = getNumber();
+        Toast.makeText(MainActivity.this, i + "", Toast.LENGTH_SHORT).show();
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(MainActivity.this, i+"", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, i + "", Toast.LENGTH_SHORT).show();
                 try {
-
-                    checkButton(i).performClick();
-                }catch (NullPointerException e){
-                    Toast.makeText(MainActivity.this,e.getMessage(), Toast.LENGTH_SHORT).show();
+                    clickButton(getButton(i), i);
+                    TURN = PLAYER_ONE;
+                    enabledButtons();
+                } catch (NullPointerException e) {
+                    Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
-        }, 4000);
-        checkGame();
-        TURN = PLAYER_ONE;
+        }, 2000);
     }
 
 
+    private void clickButton(Button button, int number) {
+        write(button);
+        setStatusBoxes(number);
+        counter++;
+        changeTurn();
+        checkGame();
+        numbers.add(number);
+        button.setEnabled(false);
+        tiedGame(counter);
+    }
+
+    private void setStatusBoxes(int number) {
+        switch (number) {
+            case 1:
+                if (TURN == PLAYER_ONE) {
+                    box1Player1 = true;
+                } else if (TURN == PLAYER_TWO) {
+                    box1Player2 = true;
+                }
+                break;
+            case 2:
+                if (TURN == PLAYER_ONE) {
+                    box2Player1 = true;
+                } else if (TURN == PLAYER_TWO) {
+                    box2Player2 = true;
+                }
+                break;
+            case 3:
+                if (TURN == PLAYER_ONE) {
+                    box3Player1 = true;
+                } else if (TURN == PLAYER_TWO) {
+                    box3Player2 = true;
+                }
+                break;
+            case 4:
+                if (TURN == PLAYER_ONE) {
+                    box4Player1 = true;
+                } else if (TURN == PLAYER_TWO) {
+                    box4Player2 = true;
+                }
+                break;
+            case 5:
+                if (TURN == PLAYER_ONE) {
+                    box5Player1 = true;
+                } else if (TURN == PLAYER_TWO) {
+                    box5Player2 = true;
+                }
+                break;
+            case 6:
+                if (TURN == PLAYER_ONE) {
+                    box6Player1 = true;
+                } else if (TURN == PLAYER_TWO) {
+                    box6Player2 = true;
+                }
+                break;
+            case 7:
+                if (TURN == PLAYER_ONE) {
+                    box7Player1 = true;
+                } else if (TURN == PLAYER_TWO) {
+                    box7Player2 = true;
+                }
+                break;
+            case 8:
+                if (TURN == PLAYER_ONE) {
+                    box8Player1 = true;
+                } else if (TURN == PLAYER_TWO) {
+                    box8Player2 = true;
+                }
+                break;
+            case 9:
+                if (TURN == PLAYER_ONE) {
+                    box9Player1 = true;
+                } else if (TURN == PLAYER_TWO) {
+                    box9Player2 = true;
+                }
+                break;
+        }
+    }
 
 
     private int getNumber() {
@@ -210,7 +294,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         while (!flag) {
             i = ((int) (Math.random() * 9) + 1);
-            if (availeble(i)) {
+            if (available(i)) {
                 numbers.add(i);
                 flag = true;
             }
@@ -218,7 +302,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return i;
     }
 
-    private Button checkButton(int i) {
+    private Button getButton(int i) {
         if (i == 1) return button1;
         if (i == 2) return button2;
         if (i == 3) return button3;
@@ -235,157 +319,130 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn1:
-                write(button1);
-                counter++;
-                if (TURN == PLAYER_ONE)
-                    box1Player1 = true;
-                if (TURN == PLAYER_TWO)
-                    box1Player2 = true;
-                changeTurn();
-                checkGame();
-                numbers.add(1);
-                button1.setEnabled(false);
-                if (computerPlays) {
-                    disabledButtons();
-                    turnOfComputer();
+                if (!computerPlays) {
+                    clickButton(button1, 1);
+                } else {
+                    if (TURN == PLAYER_ONE) {
+                        clickButton(button1, 1);
+                        TURN = COMPUTER;
+                        disabledButtons();
+                        if (!finish) {
+                            turnOfComputer();
+                        }
+                    }
                 }
-                tiedGame(counter);
                 break;
             case R.id.btn2:
-                write(button2);
-                counter++;
-                if (TURN == PLAYER_ONE)
-                    box2Player1 = true;
-                if (TURN == PLAYER_TWO)
-                    box2Player2 = true;
-                changeTurn();
-                checkGame();
-                numbers.add(2);
-                button2.setEnabled(false);
-                if (computerPlays) {
-                    disabledButtons();
-                    turnOfComputer();
+                if (!computerPlays) {
+                    clickButton(button2, 2);
+                } else {
+                    if (TURN == PLAYER_ONE) {
+                        clickButton(button1, 1);
+                        TURN = COMPUTER;
+                        disabledButtons();
+                        if (!finish) {
+                            turnOfComputer();
+                        }
+                    }
                 }
-                tiedGame(counter);
                 break;
             case R.id.btn3:
-                write(button3);
-                counter++;
-                if (TURN == PLAYER_ONE)
-                    box3Player1 = true;
-                if (TURN == PLAYER_TWO)
-                    box3Player2 = true;
-                changeTurn();
-                checkGame();
-                numbers.add(3);
-                button3.setEnabled(false);
-                if (computerPlays) {
-                    disabledButtons();
-                    turnOfComputer();
+                if (!computerPlays) {
+                    clickButton(button3, 3);
+                } else {
+                    if (TURN == PLAYER_ONE) {
+                        clickButton(button1, 1);
+                        TURN = COMPUTER;
+                        disabledButtons();
+                        if (!finish) {
+                            turnOfComputer();
+                        }
+                    }
                 }
-                tiedGame(counter);
                 break;
             case R.id.btn4:
-                write(button4);
-                counter++;
-                if (TURN == PLAYER_ONE)
-                    box4Player1 = true;
-                if (TURN == PLAYER_TWO)
-                    box4Player2 = true;
-                changeTurn();
-                checkGame();
-                numbers.add(4);
-                button4.setEnabled(false);
-                if (computerPlays) {
-                    disabledButtons();
-                    turnOfComputer();
+                if (!computerPlays) {
+                    clickButton(button4, 4);
+                } else {
+                    if(TURN == PLAYER_ONE ){
+                        clickButton(button1,1);
+                        TURN = COMPUTER;
+                        disabledButtons();
+                        if(!finish){
+                            turnOfComputer();
+                        }
+                    }
                 }
-                tiedGame(counter);
                 break;
             case R.id.btn5:
-                write(button5);
-                counter++;
-                if (TURN == PLAYER_ONE)
-                    box5Player1 = true;
-                if (TURN == PLAYER_TWO)
-                    box5Player2 = true;
-                changeTurn();
-                checkGame();
-                numbers.add(5);
-                button5.setEnabled(false);
-                if (computerPlays) {
-                    disabledButtons();
-                    turnOfComputer();
+                if (!computerPlays) {
+                    clickButton(button5, 5);
+                } else {
+                    if(TURN == PLAYER_ONE ){
+                        clickButton(button1,1);
+                        TURN = COMPUTER;
+                        disabledButtons();
+                        if(!finish){
+                            turnOfComputer();
+                        }
+                    }
                 }
-                tiedGame(counter);
                 break;
             case R.id.btn6:
-                write(button6);
-                counter++;
-                if (TURN == PLAYER_ONE)
-                    box6Player1 = true;
-                if (TURN == PLAYER_TWO)
-                    box6Player2 = true;
-                changeTurn();
-                checkGame();
-                numbers.add(6);
-                button6.setEnabled(false);
-                if (computerPlays) {
-                    disabledButtons();
-                    turnOfComputer();
+                if (!computerPlays) {
+                    clickButton(button6, 6);
+                } else {
+                    if(TURN == PLAYER_ONE ){
+                        clickButton(button1,1);
+                        TURN = COMPUTER;
+                        disabledButtons();
+                        if(!finish){
+                            turnOfComputer();
+                        }
+                    }
                 }
-                tiedGame(counter);
                 break;
             case R.id.btn7:
-                write(button7);
-                counter++;
-                if (TURN == PLAYER_ONE)
-                    box7Player1 = true;
-                if (TURN == PLAYER_TWO)
-                    box7Player2 = true;
-                changeTurn();
-                checkGame();
-                numbers.add(7);
-                button7.setEnabled(false);
-                if (computerPlays) {
-                    disabledButtons();
-                    turnOfComputer();
+                if (!computerPlays) {
+                    clickButton(button7, 7);
+                } else {
+                    if(TURN == PLAYER_ONE ){
+                        clickButton(button1,1);
+                        TURN = COMPUTER;
+                        disabledButtons();
+                        if(!finish){
+                            turnOfComputer();
+                        }
+                    }
                 }
-                tiedGame(counter);
                 break;
             case R.id.btn8:
-                write(button8);
-                counter++;
-                if (TURN == PLAYER_ONE)
-                    box8Player1 = true;
-                if (TURN == PLAYER_TWO)
-                    box8Player2 = true;
-                changeTurn();
-                checkGame();
-                numbers.add(8);
-                button8.setEnabled(false);
-                if (computerPlays) {
-                    disabledButtons();
-                    turnOfComputer();
+                if (!computerPlays) {
+                    clickButton(button8, 8);
+                } else {
+                    if(TURN == PLAYER_ONE ){
+                        clickButton(button1,1);
+                        TURN = COMPUTER;
+                        disabledButtons();
+                        if(!finish){
+                            turnOfComputer();
+                        }
+                    }
                 }
-                tiedGame(counter);
                 break;
             case R.id.btn9:
-                write(button9);
-                counter++;
-                if (TURN == PLAYER_ONE)
-                    box9Player1 = true;
-                if (TURN == PLAYER_TWO)
-                    box9Player2 = true;
-                changeTurn();
-                checkGame();
-                numbers.add(9);
-                button9.setEnabled(false);
-                if (computerPlays) {
-                    disabledButtons();
-                    turnOfComputer();
+                if (!computerPlays) {
+                    clickButton(button9, 9);
+                } else {
+                    if(TURN == PLAYER_ONE ){
+                        clickButton(button1,1);
+                        TURN = COMPUTER;
+                        disabledButtons();
+                        if(!finish){
+                            turnOfComputer();
+                        }
+                    }
                 }
-                tiedGame(counter);
                 break;
             case R.id.startAgain:
                 startGameAgain();
@@ -433,7 +490,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (TURN == PLAYER_TWO) {
             writeX(button);
         }
-        if (computerPlays) writeX(button);
     }
 
     private void tiedGame(int number) {
@@ -445,7 +501,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (!finish) {
                 tiedGames++;
             }
-            saveCounterTied();
+            saveCounterTied(prefCounters, tiedGames);
             Toast.makeText(this, "e++", Toast.LENGTH_SHORT).show();
         }
     }
@@ -471,54 +527,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void checkGame() {
 
         if (genericCheckGame(box1Player1, box2Player1, box3Player1, button1, button2, button3, PLAYER_ONE)) {
-            return;
         }
         if (genericCheckGame(box4Player1, box5Player1, box6Player1, button4, button5, button6, PLAYER_ONE)) {
-            return;
         }
         if (genericCheckGame(box7Player1, box8Player1, box9Player1, button7, button8, button9, PLAYER_ONE)) {
-            return;
         }
         if (genericCheckGame(box1Player1, box4Player1, box7Player1, button1, button4, button7, PLAYER_ONE)) {
-            return;
         }
         if (genericCheckGame(box2Player1, box5Player1, box8Player1, button2, button5, button8, PLAYER_ONE)) {
-            return;
         }
         if (genericCheckGame(box3Player1, box6Player1, box9Player1, button3, button6, button9, PLAYER_ONE)) {
-            return;
         }
         if (genericCheckGame(box1Player1, box5Player1, box9Player1, button1, button5, button9, PLAYER_ONE)) {
-            return;
         }
         if (genericCheckGame(box3Player1, box5Player1, box7Player1, button3, button5, button7, PLAYER_ONE)) {
-            return;
         }
 
 
         if (genericCheckGame(box1Player2, box2Player2, box3Player2, button1, button2, button3, PLAYER_TWO)) {
-            return;
         }
         if (genericCheckGame(box4Player2, box5Player2, box6Player2, button4, button5, button6, PLAYER_TWO)) {
-            return;
         }
         if (genericCheckGame(box7Player2, box8Player2, box9Player2, button7, button8, button9, PLAYER_TWO)) {
-            return;
         }
         if (genericCheckGame(box1Player2, box4Player2, box7Player2, button1, button4, button7, PLAYER_TWO)) {
-            return;
         }
         if (genericCheckGame(box2Player2, box5Player2, box8Player2, button2, button5, button8, PLAYER_TWO)) {
-            return;
         }
         if (genericCheckGame(box3Player2, box6Player2, box9Player2, button3, button6, button9, PLAYER_TWO)) {
-            return;
         }
         if (genericCheckGame(box1Player2, box5Player2, box9Player2, button1, button5, button9, PLAYER_TWO)) {
-            return;
         }
         if (genericCheckGame(box3Player2, box5Player2, box7Player2, button3, button5, button7, PLAYER_TWO)) {
-            return;
         }
 
     }
@@ -605,7 +645,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         winPlayer1++;
                     }
                     finish = true;
-                    saveCounterP1();
+                    saveCounterP1(prefCounters, winPlayer1);
                     Toast.makeText(this, "1++", Toast.LENGTH_SHORT).show();
                 }
                 if (player == PLAYER_TWO) {
@@ -615,7 +655,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         winPlayer2++;
                     }
                     finish = true;
-                    saveCounterP2();
+                    saveCounterP2(prefCounters, winPlayer2);
                     Toast.makeText(this, "2++", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -649,36 +689,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             tv.setTextColor(color);
         }
         snack.show();
-    }
-
-    private void saveCounterP1() {
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putInt("countP1", winPlayer1);
-        editor.apply();
-    }
-
-    private void saveCounterP2() {
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putInt("countP2", winPlayer2);
-        editor.apply();
-    }
-
-    private void saveCounterTied() {
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putInt("tied", tiedGames);
-        editor.apply();
-    }
-
-    private int getCounterP1Saved() {
-        return pref.getInt("countP1", winPlayer1);
-    }
-
-    private int getCounterP2Saved() {
-        return pref.getInt("countP2", winPlayer2);
-    }
-
-    private int getCounterTiedSaved() {
-        return pref.getInt("tied", tiedGames);
     }
 
 }
