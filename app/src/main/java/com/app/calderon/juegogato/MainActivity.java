@@ -196,9 +196,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void run() {
                 Toast.makeText(MainActivity.this, i + "", Toast.LENGTH_SHORT).show();
                 try {
-                    clickButton(getButton(i), i);
-                    TURN = PLAYER_ONE;
-                    enabledButtons();
+                    getButton(i).performClick();
                 } catch (NullPointerException e) {
                     Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
@@ -212,6 +210,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setStatusBoxes(number);
         counter++;
         changeTurn();
+        checkGame();
+        numbers.add(number);
+        button.setEnabled(false);
+        tiedGame(counter);
+    }
+
+    private void autoClickButton(Button button, int number) {
+        write(button);
+        setStatusBoxes(number);
+        counter++;
+        changeTurn();
+        enabledButtons();
         checkGame();
         numbers.add(number);
         button.setEnabled(false);
@@ -286,7 +296,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-
     private int getNumber() {
         int i = 0;
         boolean flag = false;
@@ -324,11 +333,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } else {
                     if (TURN == PLAYER_ONE) {
                         clickButton(button1, 1);
-                        TURN = COMPUTER;
+
                         disabledButtons();
                         if (!finish) {
                             turnOfComputer();
                         }
+                    }
+                    if (TURN == PLAYER_TWO) {
+                        autoClickButton(button1, 1);
                     }
                 }
                 break;
@@ -337,12 +349,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     clickButton(button2, 2);
                 } else {
                     if (TURN == PLAYER_ONE) {
-                        clickButton(button1, 1);
-                        TURN = COMPUTER;
+                        clickButton(button2,2);
                         disabledButtons();
                         if (!finish) {
                             turnOfComputer();
                         }
+                    }
+                    if (TURN == PLAYER_TWO) {
+                        autoClickButton(button2, 2);
                     }
                 }
                 break;
@@ -351,12 +365,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     clickButton(button3, 3);
                 } else {
                     if (TURN == PLAYER_ONE) {
-                        clickButton(button1, 1);
-                        TURN = COMPUTER;
+                        clickButton(button3, 3);
                         disabledButtons();
                         if (!finish) {
                             turnOfComputer();
                         }
+                    }
+                    if (TURN == PLAYER_TWO) {
+                        autoClickButton(button3, 3);
                     }
                 }
                 break;
@@ -364,13 +380,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (!computerPlays) {
                     clickButton(button4, 4);
                 } else {
-                    if(TURN == PLAYER_ONE ){
-                        clickButton(button1,1);
-                        TURN = COMPUTER;
+                    if (TURN == PLAYER_ONE) {
+                        clickButton(button4, 4);
                         disabledButtons();
-                        if(!finish){
+                        if (!finish) {
                             turnOfComputer();
                         }
+                    }
+                    if (TURN == PLAYER_TWO) {
+                        autoClickButton(button4, 4);
                     }
                 }
                 break;
@@ -378,13 +396,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (!computerPlays) {
                     clickButton(button5, 5);
                 } else {
-                    if(TURN == PLAYER_ONE ){
-                        clickButton(button1,1);
-                        TURN = COMPUTER;
+                    if (TURN == PLAYER_ONE) {
+                        clickButton(button5, 5);
                         disabledButtons();
-                        if(!finish){
+                        if (!finish) {
                             turnOfComputer();
                         }
+                    }
+                    if (TURN == PLAYER_TWO) {
+                        autoClickButton(button5, 5);
                     }
                 }
                 break;
@@ -392,13 +412,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (!computerPlays) {
                     clickButton(button6, 6);
                 } else {
-                    if(TURN == PLAYER_ONE ){
-                        clickButton(button1,1);
-                        TURN = COMPUTER;
+                    if (TURN == PLAYER_ONE) {
+                        clickButton(button6, 6);
                         disabledButtons();
-                        if(!finish){
+                        if (!finish) {
                             turnOfComputer();
                         }
+                    }
+                    if (TURN == PLAYER_TWO) {
+                        autoClickButton(button6, 6);
                     }
                 }
                 break;
@@ -406,13 +428,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (!computerPlays) {
                     clickButton(button7, 7);
                 } else {
-                    if(TURN == PLAYER_ONE ){
-                        clickButton(button1,1);
-                        TURN = COMPUTER;
+                    if (TURN == PLAYER_ONE) {
+                        clickButton(button7, 7);
                         disabledButtons();
-                        if(!finish){
+                        if (!finish) {
                             turnOfComputer();
                         }
+                    }
+                    if (TURN == PLAYER_TWO) {
+                        autoClickButton(button7, 7);
                     }
                 }
                 break;
@@ -420,13 +444,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (!computerPlays) {
                     clickButton(button8, 8);
                 } else {
-                    if(TURN == PLAYER_ONE ){
-                        clickButton(button1,1);
-                        TURN = COMPUTER;
+                    if (TURN == PLAYER_ONE) {
+                        clickButton(button8, 8);
                         disabledButtons();
-                        if(!finish){
+                        if (!finish) {
                             turnOfComputer();
                         }
+                    }
+                    if (TURN == PLAYER_TWO) {
+                        autoClickButton(button8, 8);
                     }
                 }
                 break;
@@ -434,13 +460,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (!computerPlays) {
                     clickButton(button9, 9);
                 } else {
-                    if(TURN == PLAYER_ONE ){
-                        clickButton(button1,1);
-                        TURN = COMPUTER;
+                    if (TURN == PLAYER_ONE) {
+                        clickButton(button9, 9);
                         disabledButtons();
-                        if(!finish){
+                        if (!finish) {
                             turnOfComputer();
                         }
+                    }
+                    if (TURN == PLAYER_TWO) {
+                        autoClickButton(button9, 9);
                     }
                 }
                 break;
@@ -490,6 +518,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (TURN == PLAYER_TWO) {
             writeX(button);
         }
+
     }
 
     private void tiedGame(int number) {
