@@ -1,5 +1,7 @@
 package com.app.calderon.juegogato;
 
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 
 public class Util {
@@ -7,6 +9,11 @@ public class Util {
     public static final int PLAYER_ONE_VS_PLAYER_TWO = 436;
     public static final int PLAYER_ONE_VS_COMPUTER = 437;
 
+    public static void goBack(Context context,Class<?> classToBack){
+        Intent intent = new Intent(context,classToBack);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        context.startActivity(intent);
+    }
 
     public static void saveSettingsPlayer(SharedPreferences pref, int mode) {
         SharedPreferences.Editor editor = pref.edit();

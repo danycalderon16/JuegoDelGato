@@ -19,6 +19,7 @@ import java.util.Locale;
 import static com.app.calderon.juegogato.Util.getCounterP1Saved;
 import static com.app.calderon.juegogato.Util.getCounterP2Saved;
 import static com.app.calderon.juegogato.Util.getCounterTiedSaved;
+import static com.app.calderon.juegogato.Util.goBack;
 import static com.app.calderon.juegogato.Util.saveCounterP1;
 import static com.app.calderon.juegogato.Util.saveCounterP2;
 import static com.app.calderon.juegogato.Util.saveCounterTied;
@@ -96,8 +97,7 @@ public class StatisticsActivity extends AppCompatActivity implements View.OnClic
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                Intent intent = new Intent(this,MainActivity.class);
-                startActivity(intent);
+                goBack(this,MainActivity.class);
                 return true;
             default:
             return super.onOptionsItemSelected(item);

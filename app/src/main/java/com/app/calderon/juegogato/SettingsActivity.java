@@ -13,6 +13,7 @@ import android.widget.RadioGroup;
 import static com.app.calderon.juegogato.Util.PLAYER_ONE_VS_COMPUTER;
 import static com.app.calderon.juegogato.Util.PLAYER_ONE_VS_PLAYER_TWO;
 import static com.app.calderon.juegogato.Util.getSettingsPlayer;
+import static com.app.calderon.juegogato.Util.goBack;
 import static com.app.calderon.juegogato.Util.saveSettingsPlayer;
 
 public class SettingsActivity extends AppCompatActivity implements RadioGroup.OnCheckedChangeListener {
@@ -67,8 +68,7 @@ public class SettingsActivity extends AppCompatActivity implements RadioGroup.On
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                Intent intent = new Intent(this,MainActivity.class);
-                startActivity(intent);
+                goBack(this,MainActivity.class);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

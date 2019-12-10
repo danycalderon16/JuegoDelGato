@@ -7,6 +7,8 @@
     <string name="p_one_won">Jugador 1 Ganó</string>
     <string name="p_two_won">Jugador 2 Ganó</string>
     <string name="tied_game">Juego Empatado</string>
+    <string name="won">Gano</string>
+    <string name="turns">Turno</string>
     <string name="turn1">Turno jugador 1</string>
     <string name="turn2">Turno jugador 2</string>
     <string name="finish">Finalizado</string>

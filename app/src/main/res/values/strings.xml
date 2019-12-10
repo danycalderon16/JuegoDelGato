@@ -5,6 +5,8 @@
     <string name="start_again">Start Again</string>
     <string name="p_one_won">Player 1 Won</string>
     <string name="p_two_won">Player 2 Won</string>
+    <string name="won">Won</string>
+    <string name="turns">Turns</string>
     <string name="tied_game">Tied Game</string>
     <string name="turn1">Player 1 turns</string>
     <string name="turn2">Player 2 turns</string>

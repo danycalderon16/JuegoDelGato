@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private boolean box9Player2;
 
     private boolean computerPlays = false;
+    private boolean autoclic = false;
     private boolean finish = false;
 
     private final int PLAYER_ONE = 1;
@@ -81,6 +82,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     String s = Build.MODEL;
 
+    private final int button_one = R.id.btn1;
+    private final int button_two = R.id.btn2;
+    private final int button_tree = R.id.btn3;
+    private final int button_for = R.id.btn4;
+    private final int button_five = R.id.btn5;
+    private final int button_six = R.id.btn6;
+    private final int button_seven = R.id.btn7;
+    private final int button_eight = R.id.btn8;
+    private final int button_nine = R.id.btn9;
 
     private int counter = 0;
 
@@ -189,39 +199,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void turnOfComputer() {
         final int i = getNumber();
-        Toast.makeText(MainActivity.this, i + "", Toast.LENGTH_SHORT).show();
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(MainActivity.this, i + "", Toast.LENGTH_SHORT).show();
-                try {
-                    getButton(i).performClick();
-                } catch (NullPointerException e) {
-                    Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
+                clickButton(getButton(i),i);
             }
-        }, 2000);
+        }, 1000);
     }
 
+    private void lockButtons() {
+        for (int i = 0; i < numbers.size(); i++) {
+            if (numbers.get(i) == 1) button1.setEnabled(false);
+            if (numbers.get(i) == 2) button2.setEnabled(false);
+            if (numbers.get(i) == 3) button3.setEnabled(false);
+            if (numbers.get(i) == 4) button4.setEnabled(false);
+            if (numbers.get(i) == 5) button5.setEnabled(false);
+            if (numbers.get(i) == 6) button6.setEnabled(false);
+            if (numbers.get(i) == 7) button7.setEnabled(false);
+            if (numbers.get(i) == 8) button8.setEnabled(false);
+            if (numbers.get(i) == 9) button9.setEnabled(false);
+        }
+    }
 
     private void clickButton(Button button, int number) {
         write(button);
         setStatusBoxes(number);
         counter++;
         changeTurn();
-        checkGame();
-        numbers.add(number);
-        button.setEnabled(false);
-        tiedGame(counter);
-    }
-
-    private void autoClickButton(Button button, int number) {
-        write(button);
-        setStatusBoxes(number);
-        counter++;
-        changeTurn();
-        enabledButtons();
         checkGame();
         numbers.add(number);
         button.setEnabled(false);
@@ -326,171 +331,142 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn1:
-                if (!computerPlays) {
-                    clickButton(button1, 1);
-                } else {
+        if (computerPlays) {
+            switch (v.getId()) {
+                case button_one:
                     if (TURN == PLAYER_ONE) {
                         clickButton(button1, 1);
-
-                        disabledButtons();
+                        lockButtons();
                         if (!finish) {
                             turnOfComputer();
                         }
                     }
-                    if (TURN == PLAYER_TWO) {
-                        autoClickButton(button1, 1);
-                    }
-                }
-                break;
-            case R.id.btn2:
-                if (!computerPlays) {
-                    clickButton(button2, 2);
-                } else {
+                    break;
+                case button_two:
                     if (TURN == PLAYER_ONE) {
-                        clickButton(button2,2);
-                        disabledButtons();
+                        clickButton(button2, 2);
+                        lockButtons();
                         if (!finish) {
                             turnOfComputer();
                         }
                     }
-                    if (TURN == PLAYER_TWO) {
-                        autoClickButton(button2, 2);
-                    }
-                }
-                break;
-            case R.id.btn3:
-                if (!computerPlays) {
-                    clickButton(button3, 3);
-                } else {
+                    break;
+                case button_tree:
                     if (TURN == PLAYER_ONE) {
                         clickButton(button3, 3);
-                        disabledButtons();
+                        lockButtons();
                         if (!finish) {
                             turnOfComputer();
                         }
                     }
-                    if (TURN == PLAYER_TWO) {
-                        autoClickButton(button3, 3);
-                    }
-                }
-                break;
-            case R.id.btn4:
-                if (!computerPlays) {
-                    clickButton(button4, 4);
-                } else {
+                    break;
+                case button_for:
                     if (TURN == PLAYER_ONE) {
                         clickButton(button4, 4);
-                        disabledButtons();
+                        lockButtons();
                         if (!finish) {
                             turnOfComputer();
                         }
                     }
-                    if (TURN == PLAYER_TWO) {
-                        autoClickButton(button4, 4);
-                    }
-                }
-                break;
-            case R.id.btn5:
-                if (!computerPlays) {
-                    clickButton(button5, 5);
-                } else {
+                    break;
+                case button_five:
                     if (TURN == PLAYER_ONE) {
-                        clickButton(button5, 5);
-                        disabledButtons();
+                        clickButton(button5,5);
+                        lockButtons();
                         if (!finish) {
                             turnOfComputer();
                         }
                     }
-                    if (TURN == PLAYER_TWO) {
-                        autoClickButton(button5, 5);
-                    }
-                }
-                break;
-            case R.id.btn6:
-                if (!computerPlays) {
-                    clickButton(button6, 6);
-                } else {
+                    break;
+                case button_six:
                     if (TURN == PLAYER_ONE) {
                         clickButton(button6, 6);
-                        disabledButtons();
+                        lockButtons();
                         if (!finish) {
                             turnOfComputer();
                         }
                     }
-                    if (TURN == PLAYER_TWO) {
-                        autoClickButton(button6, 6);
-                    }
-                }
-                break;
-            case R.id.btn7:
-                if (!computerPlays) {
-                    clickButton(button7, 7);
-                } else {
+                    break;
+                case button_seven:
                     if (TURN == PLAYER_ONE) {
                         clickButton(button7, 7);
-                        disabledButtons();
+                        lockButtons();
                         if (!finish) {
                             turnOfComputer();
                         }
                     }
-                    if (TURN == PLAYER_TWO) {
-                        autoClickButton(button7, 7);
-                    }
-                }
-                break;
-            case R.id.btn8:
-                if (!computerPlays) {
-                    clickButton(button8, 8);
-                } else {
+                    break;
+                case button_eight:
                     if (TURN == PLAYER_ONE) {
                         clickButton(button8, 8);
-                        disabledButtons();
+                        lockButtons();
                         if (!finish) {
                             turnOfComputer();
                         }
                     }
-                    if (TURN == PLAYER_TWO) {
-                        autoClickButton(button8, 8);
-                    }
-                }
-                break;
-            case R.id.btn9:
-                if (!computerPlays) {
-                    clickButton(button9, 9);
-                } else {
+                    break;
+                case button_nine:
                     if (TURN == PLAYER_ONE) {
                         clickButton(button9, 9);
-                        disabledButtons();
+                        lockButtons();
                         if (!finish) {
                             turnOfComputer();
                         }
                     }
-                    if (TURN == PLAYER_TWO) {
-                        autoClickButton(button9, 9);
-                    }
-                }
-                break;
-            case R.id.startAgain:
-                startGameAgain();
-                break;
+                    break;
+                case R.id.startAgain:
+                    startGameAgain();
+                    break;
+            }
+        } else {
+            switch (v.getId()) {
+                case button_one:
+                    clickButton(button1, 1);
+                    break;
+                case button_two:
+                    clickButton(button2, 2);
+                    break;
+                case button_tree:
+                    clickButton(button3, 3);
+                    break;
+                case button_for:
+                    clickButton(button4, 4);
+                    break;
+                case button_five:
+                    clickButton(button5, 5);
+                    break;
+                case button_six:
+                    clickButton(button6, 6);
+                    break;
+                case button_seven:
+                    clickButton(button7, 7);
+                    break;
+                case button_eight:
+                    clickButton(button8, 8);
+                    break;
+                case button_nine:
+                    clickButton(button9, 9);
+                    break;
+                case R.id.startAgain:
+                    startGameAgain();
+                    break;
+            }
         }
     }
 
     private void sendBind() {
-        button1 = (Button) findViewById(R.id.btn1);
-        button2 = (Button) findViewById(R.id.btn2);
-        button3 = (Button) findViewById(R.id.btn3);
-        button4 = (Button) findViewById(R.id.btn4);
-        button5 = (Button) findViewById(R.id.btn5);
-        button6 = (Button) findViewById(R.id.btn6);
-        button7 = (Button) findViewById(R.id.btn7);
-        button8 = (Button) findViewById(R.id.btn8);
-        button9 = (Button) findViewById(R.id.btn9);
-        fabStart = (FloatingActionButton) findViewById(R.id.startAgain);
-        clayout = (CoordinatorLayout) findViewById(R.id.clayout);
-        txtTurn = findViewById(R.id.txtTurn);
+        button1  = findViewById(R.id.btn1);
+        button2  = findViewById(R.id.btn2);
+        button3  = findViewById(R.id.btn3);
+        button4  = findViewById(R.id.btn4);
+        button5  = findViewById(R.id.btn5);
+        button6  = findViewById(R.id.btn6);
+        button7  = findViewById(R.id.btn7);
+        button8  = findViewById(R.id.btn8);
+        button9  = findViewById(R.id.btn9);
+        fabStart = findViewById(R.id.startAgain);
+        clayout  = findViewById(R.id.clayout);
+        txtTurn  = findViewById(R.id.txtTurn);
     }
 
     private void sendOnClick() {
@@ -531,7 +507,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 tiedGames++;
             }
             saveCounterTied(prefCounters, tiedGames);
-            Toast.makeText(this, "e++", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -546,7 +521,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void changeTurn() {
         if (TURN == PLAYER_ONE) {
             TURN = PLAYER_TWO;
-            txtTurn.setText(getString(R.string.turn2));
+            if(!computerPlays)
+                txtTurn.setText(getString(R.string.turn2));
+            else
+                txtTurn.setText(getString(R.string.turns)+" "+s);
         } else if (TURN == PLAYER_TWO) {
             TURN = PLAYER_ONE;
             txtTurn.setText(getString(R.string.turn1));
@@ -675,17 +653,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                     finish = true;
                     saveCounterP1(prefCounters, winPlayer1);
-                    Toast.makeText(this, "1++", Toast.LENGTH_SHORT).show();
                 }
                 if (player == PLAYER_TWO) {
-                    setSnackBbr(getString(R.string.p_two_won), getColor(R.color.exWon));
+                    if(computerPlays)
+                        setSnackBbr((getString(R.string.won))+" "+s, getColor(R.color.exWon));
+                    else
+                        setSnackBbr(getString(R.string.p_two_won), getColor(R.color.exWon));
                     drawLinesX(btn1, btn2, btn3);
                     if (!finish) {
                         winPlayer2++;
                     }
                     finish = true;
                     saveCounterP2(prefCounters, winPlayer2);
-                    Toast.makeText(this, "2++", Toast.LENGTH_SHORT).show();
                 }
             }
             counter = 0;
